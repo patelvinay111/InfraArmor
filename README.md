@@ -110,6 +110,20 @@ resource "aws_msk_cluster" "example_cluster" {
 
 - `-d true`: Display the output as a Markdown table.
 
+### Sample Markdown Table Output
+Review comments for: <Path>/msk.tf
+
+| Line Numbers | OWASP Category | Suggestion | Recommendation |
+|------|-----|------|------|
+| 5-7 | Security Misconfiguration | The region should be reviewed to ensure that it is the intended region for the cluster. | Review and update the region to the intended region. |
+| 9-10 | Security Misconfiguration | The cluster name should be randomized to prevent potential attackers from guessing the name and gaining unauthorized access to the cluster. | Randomize the cluster name. |
+| 11 | Security Misconfiguration | The Kafka version should be reviewed to ensure that it is the latest and most secure version. | Update the Kafka version to the latest and most secure version. |
+| 13 | Security Misconfiguration | The number of broker nodes should be reviewed to ensure that it is appropriate for the cluster. | Review and update the number of broker nodes to appropriate value. |
+| 15-19 | Insecure Direct Object References | The KMS key ARN should be reviewed to ensure that it is the intended key for encryption at rest. | Review and update the KMS key ARN to the intended key for encryption at rest. |
+| 21-24 | Insecure Direct Object References | The client authentication should be reviewed to ensure that only necessary authentication methods are enabled. | Review and update the client authentication to only enable necessary methods. |
+| 26-31 | Security Misconfiguration | The logging configuration should be reviewed to ensure that it is appropriate for the cluster. | Review and update the logging configuration to appropriate values. |
+
+
 ## Usage
 
 ```bash
