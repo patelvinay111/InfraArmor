@@ -1,7 +1,9 @@
 package org.infraarmor.app;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -13,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.List;
 
 
 public class InfraArmor {
@@ -21,6 +24,7 @@ public class InfraArmor {
         try {
             CommandLine cmd = CommandLineArgParser.parse(args);
             String tfFilepath = cmd.getOptionValue("f");
+            boolean displayMarkdown = Boolean.parseBoolean(cmd.getOptionValue("d"));
             String tfCode = FileLoader.loadFileContent(tfFilepath);
             String shots = ShotsLoader.loadShotsContent("src/main/resources/shots");
 
@@ -40,7 +44,20 @@ public class InfraArmor {
             String openApiToken = System.getenv("OPEN_API_TOKEN");
 
             String responseText = makeApiRequest(prompt, openApiToken);
-            logger.info("API Response: {}", responseText);
+            logger.debug("API Response: {}", responseText);
+
+            String responseTextJson = responseText.substring(responseText.indexOf('[')); //Get the start of JSON Array
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            List<ReportItem> reportItems = objectMapper.readValue(responseTextJson, objectMapper.getTypeFactory().constructCollectionType(List.class, ReportItem.class));
+            System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(reportItems));
+
+            //Display the result as markdown
+            if (displayMarkdown) {
+                String markdownTable = ReportFormatter.generateMarkdownTable(reportItems);
+                System.out.printf("Review comments for: %s%n", tfFilepath);
+                System.out.println(markdownTable);
+            }
         } catch (IOException e) {
             logger.error("An error occurred: {}", e.getMessage(), e);
         }

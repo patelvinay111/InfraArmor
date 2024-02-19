@@ -19,6 +19,13 @@ public class CommandLineArgParser {
                 .required()
                 .build());
 
+        options.addOption(Option.builder("d")
+                .longOpt("display_markdown")
+                .desc("Set true if you would like to output the report as a markdown table")
+                .hasArg()
+                .required(false)
+                .build());
+
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
         CommandLine cmd = null;
