@@ -13,7 +13,7 @@ This is a tool for reviewing Terraform infrastructure code with a focus on addre
 
 1. **Clone the Repository:**
     ```bash
-    git clone https://github.com/your-username/terraform-security-review.git
+    git clone https://github.com/patelvinay111/terraform-security-review.git
     cd terraform-security-review
     ```
 
