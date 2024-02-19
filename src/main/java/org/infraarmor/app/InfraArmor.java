@@ -9,11 +9,14 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import org.apache.commons.cli.CommandLine;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
 
 public class InfraArmor {
+    private static final Logger logger = LoggerFactory.getLogger(InfraArmor.class);
     public static void main(String[] args) {
         try {
             CommandLine cmd = CommandLineArgParser.parse(args);
@@ -37,9 +40,9 @@ public class InfraArmor {
             String openApiToken = System.getenv("OPEN_API_TOKEN");
 
             String responseText = makeApiRequest(prompt, openApiToken);
-            System.out.println(responseText);
+            logger.info("API Response: {}", responseText);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("An error occurred: {}", e.getMessage(), e);
         }
     }
 
@@ -70,8 +73,13 @@ public class InfraArmor {
                 JsonNode apiResponseBody = objectMapper.readTree(response.body().string());
                 return apiResponseBody.path("choices").get(0).path("text").asText();
             } else {
-                return "API Request failed. Response code: " + response.code();
+                String errorMessage = "API Request failed. Response code: " + response.code();
+                logger.error(errorMessage);
+                return errorMessage;
             }
+        } catch (IOException e) {
+            logger.error("An error occurred during the API request: {}", e.getMessage(), e);
+            throw e;
         }
     }
 }
