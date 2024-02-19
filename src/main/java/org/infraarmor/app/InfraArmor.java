@@ -7,6 +7,13 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -18,6 +25,32 @@ import java.nio.file.Paths;
 
 public class InfraArmor {
     public static void main(String[] args) {
+        String openApiToken = System.getenv("OPEN_API_TOKEN");
+
+        Options options = new Options();
+        options.addOption(Option.builder("f")
+                .longOpt("filepath")
+                .desc("Filepath of the terraform file to review")
+                .hasArg()
+                .required()
+                .build());
+
+        CommandLineParser parser = new DefaultParser();
+        HelpFormatter formatter = new HelpFormatter();
+        CommandLine cmd;
+
+        try {
+            cmd = parser.parse(options, args);
+        } catch (ParseException e) {
+            System.err.println(e.getMessage());
+            formatter.printHelp("CommandLineParserExample", options);
+            System.exit(1);
+            return;
+        }
+
+        String tfFilepath = cmd.getOptionValue("f");
+        String tfCode = loadFileContent(tfFilepath);
+
         // Load the shots
         StringBuilder shots = new StringBuilder();
         String shotsPath = "src/main/resources/shots";
@@ -30,40 +63,6 @@ public class InfraArmor {
                 }
             }
         }
-
-        String tfCode = """
-                provider "aws" {
-                  region = "us-west-2"
-                }
-                                
-                resource "aws_msk_cluster" "example_cluster" {
-                  cluster_name = "example-msk-cluster"
-                  kafka_version = "2.8.0"
-                                
-                  number_of_broker_nodes = 3
-                                
-                  encryption_info {
-                    encryption_at_rest_kms_key_arn = "arn:aws:kms:us-west-2:123456789012:key/abcd1234-a123-456a-a12b-a123b4cd5678"
-                  }
-                                
-                  client_authentication {
-                    sasl {
-                      scram {
-                        enabled = true
-                      }
-                    }
-                  }
-                                
-                  logging_info {
-                    broker_logs {
-                      cloudwatch_logs {
-                        enabled = true
-                        log_group = "msk-logs"
-                      }
-                    }
-                  }
-                }
-                """;
 
         String prompt = String.format(
                 "See the example below of Terraform code and its JSON Report. As a DevOps Security Engineer, review a " +
@@ -98,7 +97,7 @@ public class InfraArmor {
                     .url("https://api.openai.com/v1/completions")
                     .method("POST", body)
                     .addHeader("Content-Type", "application/json")
-                    .addHeader("Authorization", "Bearer OPEN_API_TOKEN")
+                    .addHeader("Authorization", String.format("Bearer %s", openApiToken))
                     .build();
 
             ObjectMapper objectMapper = new ObjectMapper();
