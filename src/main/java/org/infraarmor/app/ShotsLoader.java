@@ -4,10 +4,8 @@ import java.io.File;
 import java.io.IOException;
 
 public class ShotsLoader {
-
-    public static String loadShotsContent() throws IOException {
+    public static String loadShotsContent(String shotsPath) throws IOException {
         StringBuilder shots = new StringBuilder();
-        String shotsPath = "src/main/resources/shots";
         File shotsDir = new File(shotsPath);
         File[] listOfShots = shotsDir.listFiles();
         if (listOfShots != null) {

@@ -22,7 +22,7 @@ public class InfraArmor {
             CommandLine cmd = CommandLineArgParser.parse(args);
             String tfFilepath = cmd.getOptionValue("f");
             String tfCode = FileLoader.loadFileContent(tfFilepath);
-            String shots = ShotsLoader.loadShotsContent();
+            String shots = ShotsLoader.loadShotsContent("src/main/resources/shots");
 
             String prompt = String.format(
                 "See the example below of Terraform code and its JSON Report. As a DevOps Security Engineer, review a " +
