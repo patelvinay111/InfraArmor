@@ -111,7 +111,7 @@ resource "aws_msk_cluster" "example_cluster" {
 - `-d true`: Display the output as a Markdown table.
 
 ### Sample Markdown Table Output
-Review comments for: <Path>/msk.tf
+Review comments for: `/path/msk.tf`
 
 | Line Numbers | OWASP Category | Suggestion | Recommendation |
 |------|-----|------|------|
