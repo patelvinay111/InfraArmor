@@ -10,7 +10,59 @@ This is a tool for reviewing Terraform infrastructure code with a focus on addre
 - **Interactive Review:** Utilizing the OpenAI API, the tool provides interactive review comments and suggestions based on the input Terraform code.
 
 ## Usage
+### Integration with CI
+- Refer to the sample yml files provided in the repo for direct integration in CI
+#### Gitlab
+```yaml
+  stages:
+    - run_infra_armor
+    
+  variables:
+    INFRA_ARMOR_JAR_PATH: "InfraArmor.jar"  # Update with the actual path to your InfraArmor.jar
+    
+  run_infra_armor:
+      stage: run_infra_armor
+      script:
+      - |
+          # Get a list of all files ending in *.tf
+          terraform_files=$(find . -type f -name "*.tf")
+  
+          # Iterate over each Terraform file and run the InfraArmor command
+          for file in $terraform_files; do
+            java -jar $INFRA_ARMOR_JAR_PATH "$file" -d true
+          done
+```
 
+#### GitHub Workflows
+```yaml
+name: Run InfraArmor
+
+on:
+  push:
+    paths:
+      - '**/*.tf'
+
+jobs:
+  run_infra_armor:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Find Terraform Files
+        run: |
+          terraform_files=$(find . -type f -name "*.tf")
+          echo "::set-env name=TERRAFORM_FILES::$terraform_files"
+
+      - name: Run InfraArmor
+        run: |
+          IFS=' ' read -ra files <<< "$TERRAFORM_FILES"
+          for file in "${files[@]}"; do
+            java -jar InfraArmor.jar "$file" -d true
+          done
+```
+### Local Usage
 1. **Clone the Repository:**
     ```bash
     git clone https://github.com/patelvinay111/terraform-security-review.git
