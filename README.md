@@ -14,23 +14,23 @@ This is a tool for reviewing Terraform infrastructure code with a focus on addre
 - Refer to the sample yml files provided in the repo for direct integration in CI
 #### Gitlab
 ```yaml
-  stages:
-    - run_infra_armor
-    
-  variables:
-    INFRA_ARMOR_JAR_PATH: "InfraArmor.jar"  # Update with the actual path to your InfraArmor.jar
-    
-  run_infra_armor:
-      stage: run_infra_armor
-      script:
-      - |
-          # Get a list of all files ending in *.tf
-          terraform_files=$(find . -type f -name "*.tf")
-  
-          # Iterate over each Terraform file and run the InfraArmor command
-          for file in $terraform_files; do
-            java -jar $INFRA_ARMOR_JAR_PATH "$file" -d true
-          done
+stages:
+- run_infra_armor
+
+variables:
+INFRA_ARMOR_JAR_PATH: "InfraArmor.jar"  # Update with the actual path to your InfraArmor.jar
+
+run_infra_armor:
+  stage: run_infra_armor
+  script:
+  - |
+      # Get a list of all files ending in *.tf
+      terraform_files=$(find . -type f -name "*.tf")
+
+      # Iterate over each Terraform file and run the InfraArmor command
+      for file in $terraform_files; do
+        java -jar $INFRA_ARMOR_JAR_PATH "$file" -d true
+      done
 ```
 
 #### GitHub Workflows
