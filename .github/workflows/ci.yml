@@ -1,0 +1,26 @@
+name: Run InfraArmor
+
+on:
+  push:
+    paths:
+      - '**/*.tf'
+
+jobs:
+  run_infra_armor:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Find Terraform Files
+        run: |
+          terraform_files=$(find . -type f -name "*.tf")
+          echo "::set-env name=TERRAFORM_FILES::$terraform_files"
+
+      - name: Run InfraArmor
+        run: |
+          IFS=' ' read -ra files <<< "$TERRAFORM_FILES"
+          for file in "${files[@]}"; do
+            java -jar InfraArmor.jar "$file" -d true
+          done
