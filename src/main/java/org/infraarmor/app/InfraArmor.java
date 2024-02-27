@@ -1,9 +1,7 @@
 package org.infraarmor.app;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -23,24 +21,33 @@ public class InfraArmor {
     public static void main(String[] args) {
         try {
             CommandLine cmd = CommandLineArgParser.parse(args);
-            String tfFilepath = cmd.getOptionValue("f");
+            String subjectFilepath = cmd.getOptionValue("f");
             boolean displayMarkdown = Boolean.parseBoolean(cmd.getOptionValue("d"));
-            String tfCode = FileLoader.loadFileContent(tfFilepath);
-            String shots = ShotsLoader.loadShotsContent("src/main/resources/shots");
+            String subjectCode = FileLoader.loadFileContent(subjectFilepath);
+            String shots;
+            if (subjectFilepath.endsWith(".tf")) {
+                shots = ShotsLoader.loadShotsContent("src/main/resources/shots/Terraform/");
+            } else if (subjectFilepath.endsWith("Dockerfile")) {
+                shots = ShotsLoader.loadShotsContent("src/main/resources/shots/Dockerfile/");
+            } else if (subjectFilepath.endsWith("yaml")) {
+                shots = ShotsLoader.loadShotsContent("src/main/resources/shots/K8sYAML/");
+            } else {
+                shots = "";
+            }
 
             String prompt = String.format(
-                "See the example below of Terraform code and its JSON Report. As a DevOps Security Engineer, review a " +
-                "Terraform code for potential OWASP vulnerabilities. Analyze the provided Terraform code and list any " +
-                "security concerns related to the OWASP Top Ten, such as injection flaws, security misconfigurations, " +
-                "or any other potential vulnerabilities. Provide specific details and recommendations on how to address " +
-                "these issues with line numbers referring to the place in the code where you would make the change. " +
-                "Present the required changes in a JSON list with each element containing line_numbers(string) where " +
-                "the change should happen, associated OWASP_top_ten_concern, suggestion, and recommendation as " +
-                "attributes.\n" +
+                "See the example below of code and its JSON Report. As a DevOps Security Engineer, analyze " +
+                "the provided code and list any security concerns related to the OWASP Top Ten, such as " +
+                "injection flaws, security misconfigurations, or any other potential vulnerabilities. Provide specific " +
+                "details and recommendations on how to address these issues with line numbers referring to the place in " +
+                "the code where you would make the change. Present the required changes in a JSON list with each element " +
+                "containing line_numbers(string) where the change should happen, associated OWASP_top_ten_concern, " +
+                "suggestion, and recommendation as attributes.\n" +
                 "%s" +
                 "-------\n" +
-                "%s", shots, tfCode
+                "%s", shots, subjectCode
             );
+            System.out.println(prompt);
             String openApiToken = System.getenv("OPEN_API_TOKEN");
 
             String responseText = makeApiRequest(prompt, openApiToken);
@@ -55,7 +62,7 @@ public class InfraArmor {
             //Display the result as markdown
             if (displayMarkdown) {
                 String markdownTable = ReportFormatter.generateMarkdownTable(reportItems);
-                System.out.printf("Review comments for: %s%n", tfFilepath);
+                System.out.printf("Review comments for: %s%n", subjectFilepath);
                 System.out.println(markdownTable);
             }
         } catch (IOException e) {

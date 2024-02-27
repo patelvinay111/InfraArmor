@@ -1,0 +1,46 @@
+Dockerfile:
+# Use an official base image
+FROM python:3.8-alpine
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the application files into the container
+COPY . /app
+
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Expose the port your application will run on
+EXPOSE 5000
+
+# Define the command to run your application
+CMD ["python", "app.py"]
+
+JSON Report:
+[
+  {
+    "line_numbers": "1-2",
+    "OWASP_top_ten_concern": "Security Misconfigurations",
+    "suggestion": "Pin the version of the base image",
+    "recommendation": "Change FROM python:3.8-alpine to FROM python:3.8.15-alpine or the latest stable version."
+  },
+  {
+    "line_numbers": "6",
+    "OWASP_top_ten_concern": "Security Misconfigurations",
+    "suggestion": "Only copy necessary files to minimize the attack surface",
+    "recommendation": "Change COPY . /app to COPY app.py /app/ if app.py is the main file."
+  },
+  {
+    "line_numbers": "9",
+    "OWASP_top_ten_concern": "Sensitive Data Exposure",
+    "suggestion": "Use a safer port for exposing the application",
+    "recommendation": "Change EXPOSE 5000 to EXPOSE 8080 or another non-default, secure port."
+  },
+  {
+    "line_numbers": "4",
+    "OWASP_top_ten_concern": "Using Components with Known Vulnerabilities",
+    "suggestion": "Regularly update the base image",
+    "recommendation": "Add an 'apk update && apk upgrade' command after FROM python:3.8-alpine to update the Alpine Linux packages."
+  }
+]
