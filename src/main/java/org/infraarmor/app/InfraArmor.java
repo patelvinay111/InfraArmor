@@ -48,23 +48,23 @@ public class InfraArmor {
                 "%s", shots, subjectCode
             );
             System.out.println(prompt);
-//            String openApiToken = System.getenv("OPEN_API_TOKEN");
-//
-//            String responseText = makeApiRequest(prompt, openApiToken);
-//            logger.debug("API Response: {}", responseText);
-//
-//            String responseTextJson = responseText.substring(responseText.indexOf('[')); //Get the start of JSON Array
-//
-//            ObjectMapper objectMapper = new ObjectMapper();
-//            List<ReportItem> reportItems = objectMapper.readValue(responseTextJson, objectMapper.getTypeFactory().constructCollectionType(List.class, ReportItem.class));
-//            System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(reportItems));
-//
-//            //Display the result as markdown
-//            if (displayMarkdown) {
-//                String markdownTable = ReportFormatter.generateMarkdownTable(reportItems);
-//                System.out.printf("Review comments for: %s%n", subjectFilepath);
-//                System.out.println(markdownTable);
-//            }
+            String openApiToken = System.getenv("OPEN_API_TOKEN");
+
+            String responseText = makeApiRequest(prompt, openApiToken);
+            logger.debug("API Response: {}", responseText);
+
+            String responseTextJson = responseText.substring(responseText.indexOf('[')); //Get the start of JSON Array
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            List<ReportItem> reportItems = objectMapper.readValue(responseTextJson, objectMapper.getTypeFactory().constructCollectionType(List.class, ReportItem.class));
+            System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(reportItems));
+
+            //Display the result as markdown
+            if (displayMarkdown) {
+                String markdownTable = ReportFormatter.generateMarkdownTable(reportItems);
+                System.out.printf("Review comments for: %s%n", subjectFilepath);
+                System.out.println(markdownTable);
+            }
         } catch (IOException e) {
             logger.error("An error occurred: {}", e.getMessage(), e);
         }
